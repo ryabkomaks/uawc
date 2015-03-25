@@ -37,34 +37,44 @@ module.exports = function(grunt) {
 					expand: true,
 					cwd: 'src/sass/',
 					src: ['*.scss'],
-					dest: 'css/_styles.css'
+					dest: 'css/',
+					ext: '.css'
 				}]
 			}
 		}
-		// , sprite:{
-		// 	all: {
-		// 		src: 'src/icons/*.png',
-		// 		destImg: 'css/i/sprite.png',
-		// 		destCSS: 'src/sass/_sprite.scss',
-		// 		padding: 2,
-		// 		algorithm: 'binary-tree'
-		// 		// imgPath: './i/icons.png'
-		// 	}
-		// }
-		// sprite:{
-		//       all: {
-		//         src: 'path/to/your/sprites/*.png',
-		//         dest: 'destination/of/spritesheet.png',
-		//         destCss: 'destination/of/sprites.css'
-		//       }
-		//     }
-		// uglify: {
-		// 	my_target: {
-		// 		files: {
-		// 			'js/main.min.js': ['src/js/*.js']
-		// 		}
-		// 	}
-		// },
+		, sprite:{
+			all: {
+				src: 'src/sprite/*.png',
+				dest: 'images/sprite.png',
+				destCss: 'src/sass/_sprite.scss'
+			}
+	    }
+	    , imagemin: {
+	        dynamic: {
+	            files: [{
+	                expand: true,
+	                cwd: 'src/images/',
+	                src: ['**/*.{png,jpg,gif}'],
+	                dest: 'images/'
+	            }]
+	        }
+	    }
+		, uglify: {
+			js: {
+				files: {
+					'js/main.min.js': ['src/js/*.js']
+				}
+			}
+		}
+		, autoprefixer: {
+			options: {
+				browsers: ['ie 8', 'ie 9' , 'last 2 Chrome versions', 'last 2 Firefox versions'  ]
+			}
+			, target: {
+				src: ['css/main.css'],
+			    dest: 'css/styles.css'
+			}
+		}
 		, watch: {
 			sass_directory_import: {
 				files: ['src/sass/base/*.scss', 'src/sass/layout/*.scss', 'src/sass/modules/*.scss'],
@@ -74,39 +84,39 @@ module.exports = function(grunt) {
 				files: 'src/sass/*.scss',
 				tasks: ['sass']
 			}
-			// , jsmin: {
-			// 	files: 'src/js/*.js',
-			// 	tasks: ['uglify']
-			// }
-			// , sprite: {
-			// 	files: 'src/sass/icons/*.png',
-			// 	tasks: ['sprite']
-			// }
+			, jsmin: {
+				files: 'src/js/*.js',
+				tasks: ['newer:uglify']
+			}
+			, sprite: {
+				files: 'src/sprite/*.png',
+				tasks: ['sprite']
+			}
+			, imagemin: {
+				files: 'src/images/**/*.{png,jpg,gif}',
+				tasks: ['newer:imagemin']
+			}
 		}
-		, autoprefixer: {
-		    options: {
-		      browsers: ['ie 8', 'ie 9' , 'last 2 Chrome versions', 'last 2 Firefox versions'  ]
-		    },
-		    target: {
-		      src: ['css/_styles.css'],
-      		  dest: 'css/styles.css'
-		    }
-	  	}
+		
 	});
-	
+
+	grunt.loadNpmTasks('grunt-newer');
 	grunt.loadNpmTasks('grunt-sass-directory-import');
 	grunt.loadNpmTasks('grunt-contrib-sass');
-	// grunt.loadNpmTasks('grunt-spritesmith');
-	// grunt.loadNpmTasks('grunt-contrib-uglify');
-	grunt.loadNpmTasks('grunt-contrib-watch');
+	grunt.loadNpmTasks('grunt-spritesmith');
+	grunt.loadNpmTasks('grunt-contrib-imagemin');
+	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-autoprefixer');
+	grunt.loadNpmTasks('grunt-contrib-watch');
+	
 		
 	grunt.registerTask('default',[
 		'sass_directory_import'
 		, 'sass'
-		, 'watch'
 		, 'autoprefixer'
-		// , 'sprite'
-		// , 'uglify'
+		, 'newer:uglify'
+		, 'sprite'
+		, 'newer:imagemin'
+		, 'watch'
 	]);
 }
